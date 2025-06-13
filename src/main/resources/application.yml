@@ -1,6 +1,7 @@
 spring:
   application:
     name: task-forge
-  mongodb:
-    uri: ${SPRING_DATA_MONGODB_URI}
-    database: task-forge-db
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI}
+      database: task-forge-db

@@ -2,29 +2,30 @@ services:
   mongodb:
     image: mongo:latest
     container_name: task-forge-mongodb
-    ports:
-      - "27017:27017"
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: task-forge-db
+    ports:
+      - "27017:27017"
     volumes:
       - mongo_data:/data/db
-    restart: unless-stopped
 
   mongo-express:
     image: mongo-express:latest
-    container_name: task-forge-mongodb-express
-    ports:
-      - "8081:8081"
+    container_name: task-forge-mongo-express
+    restart: unless-stopped
     environment:
       ME_CONFIG_MONGODB_SERVER: task-forge-mongodb
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: password
+    ports:
+      - "8081:8081"
     depends_on:
       - mongodb
-    restart: unless-stopped
 
   app:
     build:
@@ -34,8 +35,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATA_MONGODB_URI:
-        mongodb://admin:password@mongdb:27017/task-forge?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/task-forge-db?authSource=admin
     depends_on:
       - mongodb
 

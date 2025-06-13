@@ -3,7 +3,7 @@ FROM openjdk:21-jdk-slim
 
 WORKDIR /task-forge
 
-COPY target/task-forge-0.0.1-SNAPSHOT.jar task-forge.jar
+COPY target/task-forge-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
