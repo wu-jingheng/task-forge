@@ -4,4 +4,3 @@ spring:
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
-      database: task-forge-db
