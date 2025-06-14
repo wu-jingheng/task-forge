@@ -4,3 +4,6 @@ spring:
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
+      auto-index-creation: true
+#      heartbeat-frequency: 10000
+#      socket-timeout: 10000
