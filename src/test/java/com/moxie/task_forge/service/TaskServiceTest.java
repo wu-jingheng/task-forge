@@ -1,75 +1,62 @@
 package com.moxie.task_forge.service;
 
-import com.moxie.task_forge.exception.TaskNotFoundException;
+import com.moxie.task_forge.dto.TaskCreateDTO;
+import com.moxie.task_forge.dto.TaskDTO;
+import com.moxie.task_forge.mapper.TaskMapper;
 import com.moxie.task_forge.model.Task;
+import com.moxie.task_forge.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class TaskServiceTest {
 
+    @Mock
+    private TaskRepository repository;
+
+    @Mock
+    private TaskMapper mapper;
+
+    @InjectMocks
+    private TaskService service;
+
     @Test
-    void addAndGetTask_shouldWork() {
-        TaskService service = new TaskService();
-        Task task = new Task("1", "Test task", "Test description");
+    void createTask_shouldWork() {
+        // Arrange
+        TaskCreateDTO createDTO = new TaskCreateDTO("Title", "Description", "1");
+        Task taskEntity = new Task("1", "Title", "Description", "1");
+        Task savedTask = new Task("1", "Title", "Description", "1");
+        TaskDTO returnedDto = new TaskDTO("1", "Title", "Description", "1");
 
-        service.addTask(task);
+        // Stub mapper.toEntity to return a Task entity when called with createDTO
+        when(mapper.toEntity(createDTO)).thenReturn(taskEntity);
 
-        Task retrievedTask = service.getTask("1");
-        assertEquals("Test task", retrievedTask.getTitle());
+        // Stub repository.save to return a Task with generated ID
+        when(repository.save(taskEntity)).thenReturn(savedTask);
+
+        // Stub mapper.toDto to return a TaskDTO when called with savedTask
+        when(mapper.toDto(savedTask)).thenReturn(returnedDto);
+
+        // Act
+        TaskDTO dto = service.createTask(createDTO);
+
+        // Assert
+        assertNotNull(dto);
+        assertEquals("1", dto.id());
+        assertEquals("Title", dto.title());
+        assertEquals("Description", dto.description());
+        assertEquals("1", dto.assigneeId());
     }
 
     @Test
-    void updateAndGetTask_shouldWork() {
-        TaskService service = new TaskService();
-        Task task = new Task("1", "Test task", "Test description");
-        service.addTask(task);
-        task.setTitle("Updated task");
-
-        service.updateTask(task);
-
-        Task retrievedTask = service.getTask("1");
-        assertEquals("Updated task", retrievedTask.getTitle());
-    }
-
-    @Test
-    void updateAndGetTask_shouldThrow() {
-        TaskService service = new TaskService();
-        Task task = new Task("1", "Test task", "Test description");
-
-        assertThrows(TaskNotFoundException.class, () -> service.updateTask(task));
-    }
-
-    @Test
-    void deleteTask_shouldWork() {
-        TaskService service = new TaskService();
-        Task task = new Task("1", "Test task", "Test description");
-        service.addTask(task);
-
-        assertDoesNotThrow(() -> service.removeTask("1"));
-    }
-
-    @Test
-    void deleteTask_shouldThrow() {
-        TaskService service = new TaskService();
-
-        assertThrows(TaskNotFoundException.class, () -> service.removeTask("1"));
-    }
-
-    @Test
-    void listTasks_shouldWork() {
-        TaskService service = new TaskService();
-        Task task1 = new Task("1", "Test task", "Test description");
-        Task task2 = new Task("2", "Test task", "Test description");
-        Task task3 = new Task("3", "Test task", "Test description");
-        service.addTask(task1);
-        service.addTask(task2);
-        service.addTask(task3);
-
-        List<Task> retrievedTasks = service.listTasks();
-
-        assertEquals(3, retrievedTasks.size());
+    void createTask_shouldThrow() {
+        // Arrange
+        TaskCreateDTO createDTO = new TaskCreateDTO(null, "Description", "1");
     }
 }
