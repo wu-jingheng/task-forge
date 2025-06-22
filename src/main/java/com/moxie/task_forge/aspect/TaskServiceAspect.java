@@ -18,7 +18,8 @@ public class TaskServiceAspect {
     private final Logger log = LoggerFactory.getLogger(TaskServiceAspect.class);
 
     @Pointcut("execution(* com.moxie.task_forge.service.TaskService.*(..))")
-    public void taskServiceMethods() {}
+    public void taskServiceMethods() {
+    }
 
     @Before("taskServiceMethods()")
     public void beforeExecution(JoinPoint joinPoint) {

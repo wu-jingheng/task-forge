@@ -1,5 +1,7 @@
 package com.moxie.task_forge.common;
 
+import org.springframework.http.HttpStatus;
+
 public class ApiResponse<T> {
     private String status; // "success" or "error"
 
@@ -7,7 +9,7 @@ public class ApiResponse<T> {
 
     private String message;
 
-    private Integer code;
+    private HttpStatus httpStatus;
 
     public ApiResponse() {
     }
@@ -17,15 +19,15 @@ public class ApiResponse<T> {
         this.status = "success";
         this.data = data;
         this.message = null;
-        this.code = 200;
+        this.httpStatus = HttpStatus.OK;
     }
 
     // Error API response constructor
-    public ApiResponse(String message, Integer code) {
+    public ApiResponse(String message, HttpStatus httpStatus) {
         this.status = "error";
         this.data = null;
         this.message = message;
-        this.code = code;
+        this.httpStatus = httpStatus;
     }
 
     public String getStatus() {
@@ -52,11 +54,15 @@ public class ApiResponse<T> {
         this.message = message;
     }
 
-    public Integer getCode() {
-        return code;
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
     }
 
-    public void setCode(Integer code) {
-        this.code = code;
+    public void setHttpStatus(HttpStatus httpStatus) {
+        this.httpStatus = httpStatus;
+    }
+
+    public int getHttpStatusCode() {
+        return httpStatus.value();
     }
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +53,7 @@ class UserServiceTest {
     }
 
     @Test
-    void findByUsername_shouldWork() {
+    void getUser_byUsername_shouldWork() {
         User user = new User("1","alice", "hashed", List.of("USER"));
         user.setId("1");
         UserDTO dto = new UserDTO("1", "alice", List.of("USER"));
@@ -60,14 +61,14 @@ class UserServiceTest {
         when(repository.findByUsername("alice")).thenReturn(Optional.of(user));
         when(mapper.toDto(user)).thenReturn(dto);
 
-        UserDTO result = service.findByUsername("alice");
+        UserDTO result = service.getUser("alice");
         assertEquals("alice", result.username());
     }
 
     @Test
     void findByUsername_shouldThrowIfNotFound() {
         when(repository.findByUsername("bob")).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> service.findByUsername("bob"));
+        assertThrows(UserNotFoundException.class, () -> service.getUser("bob"));
     }
 
     @Test
@@ -75,7 +76,7 @@ class UserServiceTest {
         User user = new User("1","alice", "hashed", List.of("USER"));
         when(repository.findByUsername("alice")).thenReturn(Optional.of(user));
 
-        service.deleteByUsername("alice");
+        service.deleteUser("alice");
 
         verify(repository).delete(user);
     }
@@ -83,7 +84,7 @@ class UserServiceTest {
     @Test
     void deleteByUsername_shouldThrowIfNotFound() {
         when(repository.findByUsername("bob")).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> service.deleteByUsername("bob"));
+        assertThrows(UserNotFoundException.class, () -> service.deleteUser("bob"));
     }
 
     @Test
@@ -96,8 +97,8 @@ class UserServiceTest {
         when(repository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(user)));
         when(mapper.toDto(user)).thenReturn(dto);
 
-        List<UserDTO> result = service.getAllUsers(pageable);
-        assertEquals(1, result.size());
-        assertEquals("alice", result.getFirst().username());
+        Page<UserDTO> result = service.getAllUsers(pageable);
+        assertEquals(1L, result.getTotalElements());
+        assertEquals("alice", result.stream().toList().getFirst().username());
     }
 }

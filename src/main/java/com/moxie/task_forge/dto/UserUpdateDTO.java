@@ -5,10 +5,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
-public record UserCreateDTO(
-        @NotBlank @Size(min = 3, max = 20)
-        String username,
-
+public record UserUpdateDTO(
         @NotBlank @Size(min = 10, max = 20)
         String password,
 

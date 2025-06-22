@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -84,12 +85,13 @@ class TaskServiceTest {
 
     @Test
     void updateTask_shouldWork() {
-        TaskUpdateDTO updateDTO = new TaskUpdateDTO("1", "Updated", "Updated desc", "2");
-        Task task = new Task("1", "Old", "Old desc", "1");
-        when(repository.findById("1")).thenReturn(Optional.of(task));
+        String id = "1";
+        TaskUpdateDTO updateDTO = new TaskUpdateDTO("Updated", "Updated desc", "2");
+        Task task = new Task(id, "Old", "Old desc", "1");
+        when(repository.findById(id)).thenReturn(Optional.of(task));
 
         // No exception thrown means success
-        service.updateTask(updateDTO);
+        service.updateTask(id, updateDTO);
 
         verify(repository).save(any(Task.class));
         assertEquals("Updated", task.getTitle());
@@ -99,9 +101,10 @@ class TaskServiceTest {
 
     @Test
     void updateTask_shouldThrowIfNotFound() {
-        TaskUpdateDTO updateDTO = new TaskUpdateDTO("notFound", "Title", "Desc", "1");
-        when(repository.findById("notFound")).thenReturn(Optional.empty());
-        assertThrows(TaskNotFoundException.class, () -> service.updateTask(updateDTO));
+        String id = "1";
+        TaskUpdateDTO updateDTO = new TaskUpdateDTO("Title", "Desc", "1");
+        when(repository.findById(id)).thenReturn(Optional.empty());
+        assertThrows(TaskNotFoundException.class, () -> service.updateTask(id, updateDTO));
     }
 
     @Test
@@ -112,8 +115,8 @@ class TaskServiceTest {
         when(repository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(task)));
         when(mapper.toDto(task)).thenReturn(dto);
 
-        List<TaskDTO> result = service.getAllTasks(pageable);
-        assertEquals(1, result.size());
-        assertEquals("1", result.getFirst().id());
+        Page<TaskDTO> result = service.getAllTasks(pageable);
+        assertEquals(1L, result.getTotalElements());
+        assertEquals("1", result.getContent().getFirst().id());
     }
 }

@@ -1,5 +1,6 @@
 package com.moxie.task_forge.controller;
 
+import com.moxie.task_forge.common.ApiResponse;
 import com.moxie.task_forge.exception.TaskNotFoundException;
 import com.moxie.task_forge.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -9,13 +10,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<String> handleTaskNotFound(TaskNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    @ExceptionHandler({
+            TaskNotFoundException.class,
+            UserNotFoundException.class
+    })
+    public ResponseEntity<ApiResponse<Void>> handleTaskNotFound(RuntimeException ex) {
+        ApiResponse<Void> response = new ApiResponse<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(response.getHttpStatus()).body(response);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFound(UserNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleGenericExceptions(Exception ex) {
+        ApiResponse<Void> response = new ApiResponse<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(response.getHttpStatus()).body(response);
     }
 }

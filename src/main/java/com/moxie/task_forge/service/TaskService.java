@@ -8,12 +8,13 @@ import com.moxie.task_forge.mapper.TaskMapper;
 import com.moxie.task_forge.model.Task;
 import com.moxie.task_forge.repository.TaskRepository;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -42,21 +43,27 @@ public class TaskService {
         return taskMapper.toDto(task);
     }
 
-    public void updateTask(TaskUpdateDTO updateDTO) {
-        String taskId = updateDTO.id();
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException(taskId));
+    public void updateTask(String id, TaskUpdateDTO updateDTO) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
 
-        task.setTitle(updateDTO.title());
-        task.setDescription(updateDTO.description());
-        task.setAssigneeId(updateDTO.assigneeId());
+        task.update(updateDTO.title(),
+                updateDTO.description(),
+                updateDTO.assigneeId(),
+                "System Temp",
+                LocalDateTime.now());
 
         taskRepository.save(task);
     }
 
-    public List<TaskDTO> getAllTasks(Pageable pageable) {
-        return taskRepository.findAll(pageable).stream()
-                .map(taskMapper::toDto)
-                .toList();
+    public void deleteTask(String id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+        task.setDeleted(true);
+    }
+
+    public Page<TaskDTO> getAllTasks(Pageable pageable) {
+        return taskRepository.findAll(pageable)
+                .map(taskMapper::toDto);
     }
 }

@@ -1,15 +1,18 @@
 package com.moxie.task_forge.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
 @Document(collection = "tasks")
 public class Task {
+    @Id
     private String id;
     private String title;
     private String description;
     private String assigneeId;
+    private boolean isDeleted;
     private String createdBy;
     private LocalDateTime createdDateTime;
     private String updatedBy;
@@ -26,6 +29,23 @@ public class Task {
         this.title = title;
         this.description = description;
         this.assigneeId = assigneeId;
+        this.isDeleted = false;
+        this.createdBy = "Temp";
+        this.createdDateTime = LocalDateTime.now();
+        this.updatedBy = "Temp";
+        this.updatedDateTime = LocalDateTime.now();
+    }
+
+    public void update(String title,
+                       String description,
+                       String assigneeId,
+                       String updatedBy,
+                       LocalDateTime updatedDateTime) {
+        this.title = title;
+        this.description = description;
+        this.assigneeId = assigneeId;
+        this.updatedBy = updatedBy;
+        this.updatedDateTime = updatedDateTime;
     }
 
     public String getId() {
@@ -58,6 +78,14 @@ public class Task {
 
     public void setAssigneeId(String assigneeId) {
         this.assigneeId = assigneeId;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public String getCreatedBy() {

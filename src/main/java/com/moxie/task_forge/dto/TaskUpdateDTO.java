@@ -4,13 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record TaskUpdateDTO(
-        @NotBlank
-        String id,
-
-        @NotBlank @Size(min=3, max=100)
+        @NotBlank @Size(min = 3, max = 100)
         String title,
 
-        @NotBlank @Size(min=3, max=1000)
+        @NotBlank @Size(min = 3, max = 1000)
         String description,
 
         @NotBlank
